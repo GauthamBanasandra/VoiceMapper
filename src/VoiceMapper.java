@@ -1,11 +1,12 @@
 import FeatureVector.FeatureVectorBuilder;
+import FeatureVector.MfccVector;
+import Metrics.DTW;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashMap;
 
 /**
  * Created by gauth_000 on 15-Aug-16.
@@ -50,41 +51,39 @@ public class VoiceMapper
         return outputFilePaths;
     }
 
-    private HashMap<String, double[]> generate_MFCC(String[] inputFilePaths, String frontEndMode) throws IOException
+    private MfccVector[] generate_MFCC(String[] inputFilePaths, String frontEndMode) throws IOException
     {
         String[] tempFiles = extract_MFCC(inputFilePaths, frontEndMode);
-        HashMap<String, double[]> mfccDict = new HashMap<String, double[]>(tempFiles.length);
-        for (String tempFile : tempFiles)
+        MfccVector[] mfccVectorsList=new MfccVector[tempFiles.length];
+
+        for (int i=0; i<mfccVectorsList.length; ++i)
         {
-            String content = new String(Files.readAllBytes(Paths.get(tempFile)), StandardCharsets.UTF_8);
+            String content = new String(Files.readAllBytes(Paths.get(tempFiles[i])), StandardCharsets.UTF_8);
             String[] dataStr=content.split(" ");
-            mfccDict.put(tempFile, to_double(dataStr));
+            mfccVectorsList[i]=new MfccVector(tempFiles[i], to_float(dataStr));
         }
 
-        return mfccDict;
+        return mfccVectorsList;
     }
 
-    private double[] to_double(String[] dataStr)
+    private float[] to_float(String[] dataStr)
     {
-        double[] data=new double[dataStr.length];
+        float[] data=new float[dataStr.length];
         for (int i = 0; i < dataStr.length; i++)
-            data[i]=Double.parseDouble(dataStr[i]);
+            data[i]=Float.parseFloat(dataStr[i]);
 
         return data;
     }
 
     public static void main(String[] args) throws IOException
     {
-        /*FeatureVectorBuilder builder = new FeatureVectorBuilder();
-
-        builder.dump_feature_vector("C:\\Users\\gauth_000\\Documents\\Projects\\VoiceMapper\\Voice samples\\Hello world\\sample4.m4a",
-                "C:\\Users\\gauth_000\\Documents\\Projects\\VoiceMapper\\Voice samples\\Hello world\\sample4.txt",
-                "cepstraFrontEnd");
-*/
         VoiceMapper voiceMapper = new VoiceMapper();
         String[] files = new String[2];
         files[0] = "C:\\Users\\gauth_000\\Documents\\Projects\\VoiceMapper\\Voice samples\\Hello world\\sample4.m4a";
         files[1] = "C:\\Users\\gauth_000\\Documents\\Projects\\VoiceMapper\\Voice samples\\Hello world\\sample1.m4a";
-        System.out.println(voiceMapper.generate_MFCC(files, "cepstraFrontEnd"));
+        MfccVector[] mfccVectors=voiceMapper.generate_MFCC(files, "cepstraFrontEnd");
+        DTW dtw=new DTW(mfccVectors[0].getMfcc(), mfccVectors[1].getMfcc());
+        dtw.compute();
+        System.out.println(dtw.getDistance());
     }
 }
