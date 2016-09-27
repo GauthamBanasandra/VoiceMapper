@@ -1,12 +1,7 @@
 import FeatureVector.FeatureVectorBuilder;
-import FeatureVector.MfccVector;
-import Metrics.DTW;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 /**
  * Created by gauth_000 on 15-Aug-16.
@@ -34,7 +29,7 @@ public class VoiceMapper
             }
     }
 
-    private String[] extract_MFCC(String[] inputFilePaths, String frontEndMode) throws IOException
+    public String[] extract_MFCC(String[] inputFilePaths, String frontEndMode) throws IOException
     {
         String[] outputFilePaths = new String[inputFilePaths.length];
         for (int i = 0; i < inputFilePaths.length; ++i)
@@ -51,7 +46,7 @@ public class VoiceMapper
         return outputFilePaths;
     }
 
-    private MfccVector[] generate_MFCC(String[] inputFilePaths, String frontEndMode) throws IOException
+    /*private MfccVector[] generate_MFCC(String[] inputFilePaths, String frontEndMode) throws IOException
     {
         String[] tempFiles = extract_MFCC(inputFilePaths, frontEndMode);
         MfccVector[] mfccVectorsList=new MfccVector[tempFiles.length];
@@ -65,7 +60,6 @@ public class VoiceMapper
 
         return mfccVectorsList;
     }
-
     private float[] to_float(String[] dataStr)
     {
         float[] data=new float[dataStr.length];
@@ -74,16 +68,12 @@ public class VoiceMapper
 
         return data;
     }
-
+*/
     public static void main(String[] args) throws IOException
     {
         VoiceMapper voiceMapper = new VoiceMapper();
-        String[] files = new String[2];
-        files[0] = "C:\\Users\\gauth_000\\Documents\\Projects\\VoiceMapper\\Voice samples\\Hello world\\sample4.m4a";
-        files[1] = "C:\\Users\\gauth_000\\Documents\\Projects\\VoiceMapper\\Voice samples\\Hello world\\sample1.m4a";
-        MfccVector[] mfccVectors=voiceMapper.generate_MFCC(files, "cepstraFrontEnd");
-        DTW dtw=new DTW(mfccVectors[0].getMfcc(), mfccVectors[1].getMfcc());
-        dtw.compute();
-        System.out.println(dtw.getDistance());
+        String[] vectorFiles=voiceMapper.extract_MFCC(args, "cepstraFrontEnd");
+        for (String filePath:vectorFiles)
+            System.out.println(filePath);
     }
 }

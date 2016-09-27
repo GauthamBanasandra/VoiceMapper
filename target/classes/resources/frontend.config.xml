@@ -70,7 +70,7 @@
 
     <component name="streamDataSource"
                type="edu.cmu.sphinx.frontend.util.StreamDataSource">
-        <property name="sampleRate" value="13000"/>
+        <property name="sampleRate" value="5000"/>
     </component>
 
 
